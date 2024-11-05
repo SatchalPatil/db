@@ -1,0 +1,95 @@
+CREATE DATABASE class;
+USE class;
+
+CREATE TABLE O_RollCall (
+    roll_no INT(3),
+    name VARCHAR(20)
+);
+
+CREATE TABLE N_RollCall (
+    roll_no INT(3),
+    name VARCHAR(20)
+);
+
+INSERT INTO O_RollCall VALUES (1, 'Himanshu');
+INSERT INTO O_RollCall VALUES (2, 'Ram');
+INSERT INTO O_RollCall VALUES (3, 'Soham');
+INSERT INTO O_RollCall VALUES (5, 'Mohan');
+INSERT INTO O_RollCall VALUES (6, 'Om');
+INSERT INTO O_RollCall VALUES (9, 'Yash');
+INSERT INTO O_RollCall VALUES (11, 'Mayur');
+
+SELECT * FROM O_RollCall;
+SELECT * FROM N_RollCall;
+
+DELIMITER //
+
+CREATE PROCEDURE cursor_proc_p1()
+BEGIN
+    DECLARE fin INTEGER DEFAULT 0;
+    DECLARE old_roll INT(3);
+    DECLARE old_name VARCHAR(20);
+    DECLARE new_roll INT(3);
+    DECLARE old_csr CURSOR FOR SELECT roll_no, name FROM O_RollCall;
+    DECLARE new_csr CURSOR FOR SELECT roll_no FROM N_RollCall;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET fin=1;
+    
+    OPEN old_csr;
+    OPEN new_csr;
+
+    ss: LOOP
+        FETCH old_csr INTO old_roll, old_name;
+        FETCH new_csr INTO new_roll;
+        
+        IF fin=1 THEN
+            LEAVE ss;
+        END IF;
+        
+        IF old_roll <> new_roll THEN
+            INSERT INTO N_RollCall VALUES(old_roll, old_name);
+        END IF;
+    END LOOP;
+
+    CLOSE old_csr;
+    CLOSE new_csr;
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE cursor_proc_p2(IN r1 INT)
+BEGIN
+    DECLARE r2 INT;
+    DECLARE exit_loop BOOLEAN DEFAULT FALSE;
+    DECLARE c1 CURSOR FOR SELECT roll_no FROM O_RollCall WHERE roll_no > r1;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET exit_loop=TRUE;
+
+    OPEN c1;
+
+    e_loop: LOOP
+        FETCH c1 INTO r2;
+
+        IF NOT EXISTS(SELECT * FROM N_RollCall WHERE roll_no = r2) THEN
+            INSERT INTO N_RollCall SELECT * FROM O_RollCall WHERE roll_no = r2;
+        END IF;
+
+        IF exit_loop THEN
+            CLOSE c1;
+            LEAVE e_loop;
+        END IF;
+    END LOOP e_loop;
+END //
+
+DELIMITER ;
+
+CALL cursor_proc_p2(5);
+
+SELECT * FROM O_RollCall;
+SELECT * FROM N_RollCall;
+
+CALL cursor_proc_p2(3);
+CALL cursor_proc_p1();
+
+SELECT * FROM O_RollCall;
+SELECT * FROM N_RollCall;

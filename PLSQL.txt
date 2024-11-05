@@ -1,0 +1,79 @@
+-- Practical No:04
+
+CREATE DATABASE library_db;
+USE library_db;
+
+CREATE TABLE Borrower (
+    Roll_no INT PRIMARY KEY,
+    Name VARCHAR(100),
+    Date_of_Issue DATE,
+    Name_of_Book VARCHAR(100),
+    Status CHAR(1) CHECK (Status IN ('I', 'R'))
+);
+
+CREATE TABLE Fine (
+    Roll_no INT,
+    Date DATE,
+    Amt DECIMAL(10, 2),
+    FOREIGN KEY (Roll_no) REFERENCES Borrower(Roll_no)
+);
+
+INSERT INTO Borrower (Roll_no, Name, Date_of_Issue, Name_of_Book, Status) VALUES (1, 'John Doe', '2024-09-01', 'C++', 'I');
+INSERT INTO Borrower (Roll_no, Name, Date_of_Issue, Name_of_Book, Status) VALUES (2, 'Jane Smith', '2024-09-15', 'SEPM', 'I');
+
+DELIMITER //
+
+CREATE PROCEDURE CalculateFine(IN roll_no INT, IN name_of_book VARCHAR(255))
+BEGIN
+     DECLARE v_date_of_issue DATE;
+     DECLARE v_status CHAR(1);
+     DECLARE v_fine_amount DECIMAL(10, 2);
+     DECLARE v_days_borrowed INT;
+     DECLARE v_error_message VARCHAR(255);
+
+     -- Exception handler for book not found
+     DECLARE CONTINUE HANDLER FOR SQLEXCEPTION
+     BEGIN
+         SET v_error_message = 'Error: The book is not currently borrowed by the user.';
+         SELECT v_error_message;
+     END;
+
+     SELECT Date_of_Issue, Status INTO v_date_of_issue, v_status 
+     FROM Borrower WHERE Roll_no = roll_no AND Name_of_Book = name_of_book;
+
+     IF v_status != 'I' THEN
+         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Book not borrowed by this user.';
+     END IF;
+
+     SET v_days_borrowed = DATEDIFF(CURDATE(), v_date_of_issue);
+
+     IF v_days_borrowed BETWEEN 15 AND 30 THEN
+         SET v_fine_amount = v_days_borrowed * 5;
+     ELSEIF v_days_borrowed > 30 THEN
+         SET v_fine_amount = (30 * 5) + ((v_days_borrowed - 30) * 50);
+     ELSE
+         SET v_fine_amount = 0;
+     END IF;
+
+     IF v_fine_amount > 0 THEN
+         UPDATE Borrower SET Status = 'R' WHERE Roll_no = roll_no AND Name_of_Book = name_of_book;
+         INSERT INTO Fine (Roll_no, Date, Amt) VALUES (roll_no, CURDATE(), v_fine_amount);
+     END IF;
+
+     -- Final message
+     SELECT 'Fine calculation completed successfully. Amount: ', v_fine_amount;
+
+END //
+DELIMITER ;
+
+CALL CalculateFine(1, 'C++');
+
+SELECT * FROM Fine;
+
+SELECT * FROM Borrower;
+
+CALL CalculateFine(2, 'SEPM');
+
+SELECT * FROM Fine;
+
+SELECT * FROM Borrower;

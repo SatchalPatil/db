@@ -1,0 +1,211 @@
+1.mysql> CREATE DATABASE school;
+
+2.mysql> USE school;
+Database changed
+3.mysql> CREATE TABLE students (id INT PRIMARY KEY, name VARCHAR(100), age INT, grade VARCHAR(10));
+
+4.mysql> CREATE TABLE students_copy AS SELECT * FROM students;
+
+5.mysql> SHOW TABLES;
++------------------+
+| Tables_in_school |
++------------------+
+| students         |
+| students_copy    |
++------------------+
+2 rows in set (0.01 sec)
+
+6.mysql> CREATE TABLE students_specific_fields AS SELECT id, name FROM students;
+
+7.mysql> DESCRIBE students_copy;
++-------+--------------+------+-----+---------+-------+
+| Field | Type         | Null | Key | Default | Extra |
++-------+--------------+------+-----+---------+-------+
+| id    | int          | NO   |     | NULL    |       |
+| name  | varchar(100) | YES  |     | NULL    |       |
+| age   | int          | YES  |     | NULL    |       |
+| grade | varchar(10)  | YES  |     | NULL    |       |
++-------+--------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+8.mysql> DESCRIBE students_specific_fields;
++-------+--------------+------+-----+---------+-------+
+| Field | Type         | Null | Key | Default | Extra |
++-------+--------------+------+-----+---------+-------+
+| id    | int          | NO   |     | NULL    |       |
+| name  | varchar(100) | YES  |     | NULL    |       |
++-------+--------------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+9.mysql> CREATE TABLE students_excluding_record AS SELECT * FROM students WHERE id != 1;
+
+
+
+10.mysql> DESCRIBE students_excluding_record;
++-------+--------------+------+-----+---------+-------+
+| Field | Type         | Null | Key | Default | Extra |
++-------+--------------+------+-----+---------+-------+
+| id    | int          | NO   |     | NULL    |       |
+| name  | varchar(100) | YES  |     | NULL    |       |
+| age   | int          | YES  |     | NULL    |       |
+| grade | varchar(10)  | YES  |     | NULL    |       |
++-------+--------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+11.mysql> CREATE TABLE students_no_records AS SELECT * FROM students WHERE 1 = 0;
+
+12.mysql> ALTER TABLE students ADD email VARCHAR(100);
+
+13.mysql> DESCRIBE students;
++-------+--------------+------+-----+---------+-------+
+| Field | Type         | Null | Key | Default | Extra |
++-------+--------------+------+-----+---------+-------+
+| id    | int          | NO   | PRI | NULL    |       |
+| name  | varchar(100) | YES  |     | NULL    |       |
+| age   | int          | YES  |     | NULL    |       |
+| grade | varchar(10)  | YES  |     | NULL    |       |
+| email | varchar(100) | YES  |     | NULL    |       |
++-------+--------------+------+-----+---------+-------+
+5 rows in set (0.00 sec)
+
+14.mysql> ALTER TABLE students MODIFY name VARCHAR(200);
+
+15.mysql> DESCRIBE students;
++-------+--------------+------+-----+---------+-------+
+| Field | Type         | Null | Key | Default | Extra |
++-------+--------------+------+-----+---------+-------+
+| id    | int          | NO   | PRI | NULL    |       |
+| name  | varchar(200) | YES  |     | NULL    |       |
+| age   | int          | YES  |     | NULL    |       |
+| grade | varchar(10)  | YES  |     | NULL    |       |
+| email | varchar(100) | YES  |     | NULL    |       |
++-------+--------------+------+-----+---------+-------+
+5 rows in set (0.00 sec)
+
+16.mysql> ALTER TABLE students DROP COLUMN email;
+
+17.mysql> ALTER TABLE students RENAME TO pupils;
+
+18.mysql> SHOW TABLES;
++---------------------------+
+| Tables_in_school          |
++---------------------------+
+| pupils                    |
+| students_copy             |
+| students_excluding_record |
+| students_no_records       |
+| students_specific_fields  |
++---------------------------+
+5 rows in set (0.00 sec)
+
+19.mysql> ALTER TABLE PUPILS RENAME COLUMN name TO full_name;
+
+20.mysql> DESCRIBE pupils;
++-----------+--------------+------+-----+---------+-------+
+| Field     | Type         | Null | Key | Default | Extra |
++-----------+--------------+------+-----+---------+-------+
+| id        | int          | NO   | PRI | NULL    |       |
+| full_name | varchar(200) | YES  |     | NULL    |       |
+| age       | int          | YES  |     | NULL    |       |
+| grade     | varchar(10)  | YES  |     | NULL    |       |
++-----------+--------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+21.mysql> CREATE VIEW all_pupils_view AS SELECT * FROM pupils; SELECT * FROM all_pupils_view;
+ERROR 1050 (42S01): Table 'all_pupils_view' already exists
++----+-----------+------+-------+
+| id | full_name | age  | grade |
++----+-----------+------+-------+
+|  1 | Ali       |   20 | TY    |
+|  2 | Rohan     |   20 | TY    |
+|  3 | Tanmay    |   20 | TY    |
+|  4 | Atharava  |   20 | TY    |
++----+-----------+------+-------+
+4 rows in set (0.00 sec)
+
+22.mysql> CREATE VIEW specific_fields_pupils_view AS SELECT id, full_name FROM pupils; SELECT * FROM specific_fields_pupils_view;
+
++----+-----------+
+| id | full_name |
++----+-----------+
+|  1 | Ali       |
+|  2 | Rohan     |
+|  3 | Tanmay    |
+|  4 | Atharava  |
++----+-----------+
+4 rows in set (0.00 sec)
+
+23.mysql> CREATE VIEW specific_pupil_record_view AS SELECT * FROM pupils WHERE id = 1; SELECT * FROM specific_pupil_record_view;
+
++----+-----------+------+-------+
+| id | full_name | age  | grade |
++----+-----------+------+-------+
+|  1 | Ali       |   20 | TY    |
++----+-----------+------+-------+
+1 row in set (0.00 sec)
+
+24.mysql> CREATE OR REPLACE VIEW pupils_age_above_10_view AS SELECT * FROM pupils WHERE age > 10; SELECT * FROM pupils_age_above_10_view;
+
++----+-----------+------+-------+
+| id | full_name | age  | grade |
++----+-----------+------+-------+
+|  1 | Ali       |   20 | TY    |
+|  2 | Rohan     |   20 | TY    |
+|  3 | Tanmay    |   20 | TY    |
+|  4 | Atharava  |   20 | TY    |
++----+-----------+------+-------+
+4 rows in set (0.00 sec)
+
+25.mysql> SELECT * FROM pupils;
++----+-----------+------+-------+
+| id | full_name | age  | grade |
++----+-----------+------+-------+
+|  1 | Ali       |   20 | TY    |
+|  2 | Rohan     |   20 | TY    |
+|  3 | Tanmay    |   20 | TY    |
+|  4 | Atharava  |   20 | TY    |
++----+-----------+------+-------+
+4 rows in set (0.00 sec)
+
+26.mysql> SELECT * FROM pupils WHERE id = 1;
++----+-----------+------+-------+
+| id | full_name | age  | grade |
++----+-----------+------+-------+
+|  1 | Ali       |   20 | TY    |
++----+-----------+------+-------+
+1 row in set (0.00 sec)
+
+27.mysql> UPDATE pupils SET grade = 'Final Year' WHERE id = 1;
+
+28.mysql> SELECT * FROM pupils WHERE id = 1;
++----+-----------+------+------------+
+| id | full_name | age  | grade      |
++----+-----------+------+------------+
+|  1 | Ali       |   20 | Final Year |
++----+-----------+------+------------+
+1 row in set (0.00 sec)
+
+29.mysql> DELETE FROM pupils WHERE id = 2;
+
+30.mysql> SELECT * FROM pupils;
++----+-----------+------+------------+
+| id | full_name | age  | grade      |
++----+-----------+------+------------+
+|  1 | Ali       |   20 | Final Year |
+|  3 | Tanmay    |   20 | TY         |
+|  4 | Atharava  |   20 | TY         |
++----+-----------+------+------------+
+3 rows in set (0.00 sec)
+
+
+31.mysql> CREATE INDEX idx_full_name ON pupils (full_name);
+show indexes from pupils;
++--------+------------+---------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+| Table  | Non_unique | Key_name      | Seq_in_index | Column_name | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment | Visible | Expression |
++--------+------------+---------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+| pupils |          0 | PRIMARY       |            1 | id          | A         |           3 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| pupils |          1 | idx_full_name |            1 | full_name   | A         |           3 |     NULL |   NULL | YES  | BTREE      |         |
+   | YES     | NULL       |
++--------+------------+---------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+2 rows in set (0.01 sec)
+

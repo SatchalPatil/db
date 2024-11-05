@@ -1,0 +1,112 @@
+mysql> use school;
+Database changed
+mysql> CREATE TABLE pupils (id INT, full_name VARCHAR(50), age INT, grade VARCHAR(20)); CREATE TABLE classes (class_id INT, subject VARCHAR(50), teacher VARCHAR(50)); INSERT INTO pupils (id, full_name, age, grade) VALUES (1, 'Ali', 20, 'TY'), (2, 'Rohan', 20, 'TY'), (3, 'Tanmay', 20, 'TY'), (4, 'Atharava', 20, 'TY'); INSERT INTO classes (class_id, subject, teacher) VALUES (1, 'Math', 'Mr. Sharma'), (2, 'Science', 'Ms. Gupta'), (3, 'History', 'Mr. Khan');
+
+mysql> SELECT pupils.full_name, classes.subject, classes.teacher FROM pupils INNER JOIN classes ON pupils.id = classes.class_id;
++-----------+---------+------------+
+| full_name | subject | teacher    |
++-----------+---------+------------+
+| Ali       | Math    | Mr. Sharma |
+| Rohan     | Science | Ms. Gupta  |
+| Tanmay    | History | Mr. Khan   |
++-----------+---------+------------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT pupils.full_name, classes.subject, classes.teacher FROM pupils LEFT JOIN classes ON pupils.id = classes.class_id;
++-----------+---------+------------+
+| full_name | subject | teacher    |
++-----------+---------+------------+
+| Ali       | Math    | Mr. Sharma |
+| Rohan     | Science | Ms. Gupta  |
+| Tanmay    | History | Mr. Khan   |
+| Atharava  | NULL    | NULL       |
++-----------+---------+------------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT pupils.full_name, classes.subject, classes.teacher FROM pupils RIGHT JOIN classes ON pupils.id = classes.class_id;
++-----------+---------+------------+
+| full_name | subject | teacher    |
++-----------+---------+------------+
+| Ali       | Math    | Mr. Sharma |
+| Rohan     | Science | Ms. Gupta  |
+| Tanmay    | History | Mr. Khan   |
++-----------+---------+------------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT pupils.full_name, classes.subject, classes.teacher FROM pupils FULL OUTER JOIN classes ON pupils.id = classes.class_id;
+
+mysql> SELECT pupils.full_name, classes.subject, classes.teacher FROM pupils LEFT JOIN classes ON pupils.id = classes.class_id UNION SELECT pupils.full_name, classes.subject, classes.teacher FROM pupils RIGHT JOIN classes ON pupils.id = classes.class_id;
++-----------+---------+------------+
+| full_name | subject | teacher    |
++-----------+---------+------------+
+| Ali       | Math    | Mr. Sharma |
+| Rohan     | Science | Ms. Gupta  |
+| Tanmay    | History | Mr. Khan   |
+| Atharava  | NULL    | NULL       |
++-----------+---------+------------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT pupils.full_name, classes.subject, classes.teacher FROM pupils CROSS JOIN classes;
++-----------+---------+------------+
+| full_name | subject | teacher    |
++-----------+---------+------------+
+| Ali       | History | Mr. Khan   |
+| Ali       | Science | Ms. Gupta  |
+| Ali       | Math    | Mr. Sharma |
+| Rohan     | History | Mr. Khan   |
+| Rohan     | Science | Ms. Gupta  |
+| Rohan     | Math    | Mr. Sharma |
+| Tanmay    | History | Mr. Khan   |
+| Tanmay    | Science | Ms. Gupta  |
+| Tanmay    | Math    | Mr. Sharma |
+| Atharava  | History | Mr. Khan   |
+| Atharava  | Science | Ms. Gupta  |
+| Atharava  | Math    | Mr. Sharma |
++-----------+---------+------------+
+12 rows in set (0.00 sec)
+
+mysql> SELECT full_name FROM pupils WHERE id = (SELECT MAX(id) FROM pupils);
++-----------+
+| full_name |
++-----------+
+| Atharava  |
++-----------+
+1 row in set (0.00 sec)
+
+mysql> SELECT full_name FROM pupils WHERE grade = (SELECT grade FROM pupils WHERE full_name = 'Ali');
++-----------+
+| full_name |
++-----------+
+| Ali       |
+| Rohan     |
+| Tanmay    |
+| Atharava  |
++-----------+
+4 rows in set (0.00 sec)
+
+mysql> CREATE VIEW view_all_pupils AS SELECT * FROM pupils; SELECT * FROM view_all_pupils;
++------+-----------+------+-------+
+| id   | full_name | age  | grade |
++------+-----------+------+-------+
+|    1 | Ali       |   20 | TY    |
+|    2 | Rohan     |   20 | TY    |
+|    3 | Tanmay    |   20 | TY    |
+|    4 | Atharava  |   20 | TY    |
++------+-----------+------+-------+
+4 rows in set (0.00 sec)
+
+mysql> CREATE VIEW view_pupil_details AS SELECT full_name, grade FROM pupils; SELECT * FROM view_pupil_details;
+
++-----------+-------+
+| full_name | grade |
++-----------+-------+
+| Ali       | TY    |
+| Rohan     | TY    |
+| Tanmay    | TY    |
+| Atharava  | TY    |
++-----------+-------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT full_name, age FROM pupils WHERE age > (SELECT AVG(age) FROM pupils);
+Empty set (0.00 sec)
+

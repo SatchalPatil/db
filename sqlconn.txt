@@ -1,0 +1,16 @@
+CREATE TABLE students (
+                                            id INT AUTO_INCREMENT PRIMARY KEY,
+                                            name VARCHAR(100) NOT NULL,
+                                            class VARCHAR(50) NOT NULL,
+                                           marks DECIMAL(5, 2) NOT NULL
+                                        );
+Query OK, 0 rows affected (0.0274 sec)
+ MySQL  localhost:3306 ssl  school  SQL > select * from students;
++----+-------+-------+-------+
+| id | name  | class | marks |
++----+-------+-------+-------+
+|  1 | | te-c  |  3.21 |
++----+-------+-------+-------+
+1 row in set (0.0008 sec)
+ MySQL  localhost:3306 ssl  school  SQL > select * from students;
+Empty set (0.0006 sec)
